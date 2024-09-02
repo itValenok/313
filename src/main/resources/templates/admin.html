@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Username</th>
+        <th scope="col">Password</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user: ${users}">
+        <td><a th:href="@{user(id=${user.getId()})}" th:text="${user.getId()}">VALUE</a></td>
+        <td th:text="${user.getUsername()}">VALUE</td>
+        <td th:text="${user.getPassword()}">VALUE</td>
+        <td>
+            <a th:href="@{edit(id=${user.getId()})}">Edit</a>
+            <a th:href="@{delete(id=${user.getId()})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br/>
+<a href="/admin/add">AddUser</a>
+<br>
+<a href="/logout">Logout</a>
+</html>
