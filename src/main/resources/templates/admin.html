@@ -4,30 +4,213 @@
 <head>
     <meta charset="UTF-8">
     <title>Пользователи</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
 </head>
-<table class="table table-bordered">
-    <thead>
-    <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Username</th>
-        <th scope="col">Password</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user: ${users}">
-        <td><a th:href="@{user(id=${user.getId()})}" th:text="${user.getId()}">VALUE</a></td>
-        <td th:text="${user.getUsername()}">VALUE</td>
-        <td th:text="${user.getPassword()}">VALUE</td>
-        <td>
-            <a th:href="@{edit(id=${user.getId()})}">Edit</a>
-            <a th:href="@{delete(id=${user.getId()})}">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<br/>
-<a href="/admin/add">AddUser</a>
-<br>
-<a href="/logout">Logout</a>
+
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="">
+        <span class="font-weight-bold" th:text="${current_user.getUsername()}"/> with roles:
+        <span th:each="role : ${current_user.getAuthorities()}">
+            <span th:text="${role.getAuthority()}"/>
+        </span>
+    </a>
+    <form class="form-inline" th:action="@{/logout}">
+        <button type="submit" class="btn btn-dark ml-auto">Logout</button>
+    </form>
+</nav>
+
+<main class="d-flex flex-nowrap">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-white" style="width: 280px;">
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="/admin/" class="nav-link active" aria-current="page">
+                    Admin
+                </a>
+            </li>
+            <li>
+                <a href="/admin/user" class="nav-link text-blue">
+                    User
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="b-example-divider b-example-vr"></div>
+
+    <div class="col">
+        <h1>Admin panel</h1>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/admin/">Users table</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/add">New user</a>
+        </ul>
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+
+            </thead>
+            <tr><h3>All users</h3></tr>
+            <tr>
+                <hr>
+                <th scope="col">Id</th>
+                <th scope="col">Username</th>
+                <th scope="col">Password</th>
+                <th scope="col">Role</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user: ${users}">
+                <td th:text="${user.getId()}">VALUE</td>
+                <td th:text="${user.getUsername()}">VALUE</td>
+                <td th:text="${user.getPassword()}">VALUE</td>
+                <td th:text="${user.getAuthorities()}">VALUE</td>
+                <!--            Модальное окно редактирования-->
+                <td>
+                    <button type="button" class="btn btn-success" data-toggle="modal"
+                            th:href="@{'#edit_user'+${user.getId()}}">Edit
+                    </button>
+                    <div class="modal fade" th:id="'edit_user'+${user.getId()}" tabindex="-1" role="dialog"
+                         aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="editModalLabel">Edit user</h1>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form th:id="'form_edit_user'+${user.getId()}" th:action="@{/admin/edit}"
+                                          th:method="post" th:object="${edit_user}">
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">ID</span>
+                                            <input type="text"
+                                                   th:value="${user.getId()}"
+                                                   th:name="id" class="form-control"
+                                                   readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">Username</span>
+                                            <input type="text"
+                                                   th:value="${user.getUsername()}"
+                                                   name="username" class="form-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">Password</span>
+                                            <input type="password"
+                                                   name="password"
+                                                   th:value="${user.getPassword()}"
+                                                   class="form-control">
+                                        </div>
+                                        <div class="form-group col-sm-5"
+                                             style="text-align: center; margin: 0 auto;">
+                                            <span class="font-weight-bold">Role</span>
+                                            <select multiple class="form-control"
+                                                    name="roles" size="2">
+                                                <div th:each="role : ${roles}">
+                                                    <option th:text="${role.getRoleName()}"
+                                                            th:value="${role.getId()}"
+                                                            th:field="*{roles}"/>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" th:form="'form_edit_user'+${user.getId()}">Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+
+                <!--            Модальное окно удаления-->
+                <td>
+                    <button type="button" class="btn btn-danger" data-toggle="modal"
+                            th:href="'#delete_user'+${user.getId()}">Delete
+                    </button>
+                    <div class="modal fade" th:id="'delete_user'+${user.getId()}" tabindex="-1" role="dialog"
+                         aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="deleteModalLabel">Delete</h1>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form th:id="'form_delete_user'+${user.getId()}" th:action="@{/admin/delete}"
+                                          th:method="post">
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">ID</span>
+                                            <input type="text"
+                                                   th:value="${user.getId()}"
+                                                   name="id" class="form-control"
+                                                   readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">Username</span>
+                                            <input type="text"
+                                                   th:value="${user.getUsername()}"
+                                                   name="username" class="form-control"
+                                                   readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <span class="font-weight-bold">Password</span>
+                                            <input type="password"
+                                                   name="password"
+                                                   class="form-control"
+                                                   readonly>
+                                        </div>
+                                        <div class="form-group col-sm-5"
+                                             style="text-align: center; margin: 0 auto;">
+                                            <span class="font-weight-bold">Role</span>
+                                            <select multiple class="form-control"
+                                                    name="roles" size="2" readonly>
+                                                <div th:each="role : ${roles}">
+                                                    <option th:text="${role.getRoleName()}"
+                                                            th:value="${role.getId()}"/>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                    </button>
+                                    <button type="submit" class="btn btn-danger"
+                                            th:form="'form_delete_user'+${user.getId()}">Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
 </html>

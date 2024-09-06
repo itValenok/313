@@ -56,24 +56,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user =
-//                User.builder()
-//                        .username("user")
-//                        .password(passwordEncoder().encode("user"))
-//                        .roles("USER")
-//                        .build();
-//        UserDetails admin =
-//                User.builder()
-//                        .username("admin")
-//                        .password(passwordEncoder().encode("admin"))
-//                        .roles("ADMIN", "USER")
-//                        .build();
-//
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
 @Bean
 public DaoAuthenticationProvider daoAuthenticationProvider() {
     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -81,11 +63,4 @@ public DaoAuthenticationProvider daoAuthenticationProvider() {
     authenticationProvider.setUserDetailsService(userService);
     return authenticationProvider;
 }
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(
-//                username -> Optional.of(userService.loadUserByUsername(username))
-//                        .orElseThrow(() -> new UsernameNotFoundException("User not found"))
-//        ).passwordEncoder(passwordEncoder());
-//    }
 }
